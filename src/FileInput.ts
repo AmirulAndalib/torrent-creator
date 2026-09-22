@@ -65,7 +65,7 @@ export function createFolderStructure(files: FileList) {
     return rootFolder;
 }
 
-export function loadFileOrFolder(files: FileList | null): SelectedFileOrFolderInfo | null {
+export function loadFileOrFolder(files: FileList | null, isFolderSelector: boolean): SelectedFileOrFolderInfo | null {
     if (files === null) {
         return null;
     }
@@ -92,7 +92,7 @@ export function loadFileOrFolder(files: FileList | null): SelectedFileOrFolderIn
     let input: SelectedFileOrFolderInfo["input"] | null = null;
     const fileList: FileWithPath[] = [];
 
-    if (rootFolder.folders.size === 0 && rootFolder.files.size === 1) {
+    if (rootFolder.folders.size === 0 && rootFolder.files.size === 1 && !isFolderSelector) {
         // Single file
 
         for (const [fileName, file] of rootFolder.files) {

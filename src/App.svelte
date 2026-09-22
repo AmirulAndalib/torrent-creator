@@ -17,26 +17,27 @@
     import { workerPoolPromise } from "./Sha1";
     import CustomCheckbox from "./CustomCheckbox.svelte";
 
-    const enum TorrentCreationState {
-        NotStarted,
-        InProgress,
-        ReadyToDownload,
-    }
+    const TorrentCreationState = {
+        NotStarted: 0,
+        InProgress: 1,
+        ReadyToDownload: 2,
+    } as const;
+    type TorrentCreationState = (typeof TorrentCreationState)[keyof typeof TorrentCreationState];
 
     let fileSelectorInput: HTMLInputElement;
     let folderSelectorInput: HTMLInputElement;
 
     let selectedFileOrFolderInfo: SelectedFileOrFolderInfo | null = $state(null);
 
-    function selectFileOrFolder(files: FileList | null) {
-        selectedFileOrFolderInfo = loadFileOrFolder(files);
+    function selectFileOrFolder(files: FileList | null, isFolderSelector: boolean) {
+        selectedFileOrFolderInfo = loadFileOrFolder(files, isFolderSelector);
 
         if (selectedFileOrFolderInfo !== null) {
             torrentUIParameters.name = selectedFileOrFolderInfo.name;
         }
     }
 
-    let creationState = $state(TorrentCreationState.NotStarted);
+    let creationState: TorrentCreationState = $state(TorrentCreationState.NotStarted);
     let disableInputs = $derived.by(() => creationState === TorrentCreationState.InProgress);
 
     interface BuiltinTrackerUIParams {
@@ -355,7 +356,7 @@
         disabled={disableInputs}
         bind:this={fileSelectorInput}
         onclick={() => (fileSelectorInput.value = "")}
-        onchange={() => selectFileOrFolder(fileSelectorInput.files)}
+        onchange={() => selectFileOrFolder(fileSelectorInput.files, false)}
     />
     <input
         type="file"
@@ -364,7 +365,7 @@
         bind:this={folderSelectorInput}
         webkitdirectory
         onclick={() => (folderSelectorInput.value = "")}
-        onchange={() => selectFileOrFolder(folderSelectorInput.files)}
+        onchange={() => selectFileOrFolder(folderSelectorInput.files, true)}
     />
 
     <input
